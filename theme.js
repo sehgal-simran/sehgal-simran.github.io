@@ -1,5 +1,5 @@
 (function () {
-  var THEMES = ['light', 'dark', 'warm', 'lavender', 'blueprint', 'starry', 'gingham'];
+  var THEMES = ['light', 'dark', 'warm', 'lavender', 'blueprint', 'starry'];
 
   function setTheme(name) {
     document.documentElement.setAttribute('data-theme', name);
