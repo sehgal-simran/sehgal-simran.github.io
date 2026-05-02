@@ -17,7 +17,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     // Mark active dot
-    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var current = document.documentElement.getAttribute('data-theme') || 'blueprint';
     document.querySelectorAll('.theme-dot').forEach(function (dot) {
       dot.classList.toggle('active', dot.getAttribute('data-theme') === current);
       dot.addEventListener('click', function () {

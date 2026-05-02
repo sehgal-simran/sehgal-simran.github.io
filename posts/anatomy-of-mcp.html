@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="blueprint">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anatomy of MCP — Tangents</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../theme.js"></script>
+</head>
+<body>
+
+  <div class="theme-dots">
+    <span class="theme-dot" data-theme="light" title="Light"></span>
+    <span class="theme-dot" data-theme="dark" title="Dark"></span>
+    <span class="theme-dot" data-theme="warm" title="Warm"></span>
+    <span class="theme-dot" data-theme="lavender" title="Lavender"></span>
+    <span class="theme-dot" data-theme="blueprint" title="Blueprint"></span>
+    <span class="theme-dot" data-theme="starry" title="Starry"></span>
+  </div>
+
+  <a class="back-link" href="../index.html">&larr; Tangents</a>
+
+  <header class="post-header">
+    <h1 class="post-title">Anatomy of MCP</h1>
+    <p class="post-meta">March 2026</p>
+  </header>
+
+  <article class="post-body">
+    <p><em>The explainer. What MCP is, how it works, and what the pieces do.</em></p>
+
+    <hr>
+
+    <p>MCP is a protocol, like HTTP, UDP, TCP &rarr; at the very core, it is an agreement on how 2 nodes, systems will communicate with each other if they are both subscribing to the &ldquo;model context protocol&rdquo;.</p>
+
+    <p>The LLM app is the MCP host, and to connect to the world, it starts seeing all possible data sources, apps it wants to connect to as MCP servers, and to connect to them, it spins up individual MCP clients. If you&rsquo;ve seen depictions of Durga — each arm wielding a different divine weapon, each purpose-built for a specific enemy — that&rsquo;s essentially the architecture. One brain, many dedicated arms, each connected to its own tool.</p>
+
+    <p>Each MCP client maintains a dedicated connection with their MCP server — which is quite an interesting choice, I imagine maintaining so many connections is extra overhead for the LLM app.</p>
+
+    <p>And what are the MCP clients and servers exchanging? Context for the model.</p>
+
+    <blockquote>Context &ne; a single request. Context = the evolving shared state between client and server across multiple exchanges.</blockquote>
+
+    <p>It is a message from the MCP client in the LLM app to the MCP server but also some data, response from the MCP server to the client, and it is also not a single pass, but keeps getting built on — context is what is created and used when the client and server talk to each other. In the olden days it was HTTP requests, responses.</p>
+
+    <h2>The Protocol Stack</h2>
+
+    <p>HTTP as a protocol defines how data should be packaged and data is sent through TCP. So HTTP is the data layer and TCP is the transport layer.</p>
+
+    <p>MCP has both these parts defined as well, naturally.</p>
+
+    <p><img src="../assets/mcp-protocol-stack.png" alt="Side-by-side diagram. HTTP stack: HTTP (data) over TCP (transport). MCP stack: JSON-RPC 2.0 (data) over STDIO or Streamable HTTP (transport)."></p>
+
+    <p>As a developer, we could just learn the data layer and get away with our job. But if we do dive into the transport layer — things get interesting here.</p>
+
+    <p><strong>STDIO</strong>: There is clear intention for MCP to be the LLM&rsquo;s portal to the rest of the system/OS, because one half of the transport layer is the STDIO link, which makes access to processes running on the machine light-speed fast. This area is still unsolved as of now — an LLM cannot generally control the computer too well, and it will be interesting to see if the STDIO primitive suffices to enable the future of this space.</p>
+
+    <p><strong>Streamable HTTP</strong>: The client and server need to talk <em>a lot</em>. This isn&rsquo;t a one-off request — it&rsquo;s a back and forth and back again. They need session state, conversation history, and an always-warm connection. LLM apps stream by nature: Claude, ChatGPT, they all send you words as they&rsquo;re computed, not all at once. Tool use is expected to take time, and you want that app &rarr; tool back and forth without reconnecting each time. Streamable HTTP gives you that.</p>
+
+    <h2>What Servers Expose</h2>
+
+    <ul>
+      <li><strong>Tools</strong> — executable functions that the LLM can ask to call</li>
+      <li><strong>Prompts</strong> — templates that guide the LLM&rsquo;s interaction</li>
+      <li><strong>Resources</strong> — data sources: files, records, schemas</li>
+    </ul>
+
+    <p>Imagine an MCP server for your company&rsquo;s Postgres database. It exposes: a tool to run SQL queries, a resource containing the schema (so the LLM knows what tables exist), and a prompt with few-shot examples so it doesn&rsquo;t write garbage SQL.</p>
+
+    <h2>What Clients Offer Back</h2>
+
+    <p>It is interesting what the client offers to the server — it shows how they are building for a world where onus is heavily on MCP servers to serve the client.</p>
+
+    <ul>
+      <li><strong>Sampling</strong>: Say a GitHub MCP server needs to summarize a diff before deciding what to do next — instead of bundling its own LLM, it can ask the host LLM to do the thinking. This also grabs adaptability from servers: if Claude is differently intelligent to GPT, they would use the tool differently, and this feature takes that to the next level.</li>
+      <li><strong>Elicitation</strong>: Allows the server to talk to the user directly and get additional information — a bypass highway, straight from the MCP server to you. Elicitation lets the server say &lsquo;hey, I need the human to answer something before I can proceed.&rsquo; All nodes deferring to each other.</li>
+      <li><strong>Logging</strong>: Get logs from server for monitoring.</li>
+    </ul>
+
+    <h2>An Experimental Primitive</h2>
+
+    <blockquote><strong>Tasks (Experimental)</strong>: Durable execution wrappers that enable deferred result retrieval and status tracking for MCP requests (e.g., expensive computations, workflow automation, batch processing, multi-step operations)</blockquote>
+
+    <p>Eager to see if this will develop into a new protocol of its own and quash streamable HTTP.</p>
+
+    <hr>
+
+    <p><em>For the opinion piece on what all this means: <a href="mcp-is-just-plumbing.html">MCP is Just Plumbing (And That&rsquo;s Fine)</a></em></p>
+  </article>
+
+  <footer class="site-footer">
+    Simran Sehgal
+    <span class="footer-sep">&middot;</span>
+    <a href="https://github.com/sehgal-simran">github</a>
+    <span class="footer-sep">&middot;</span>
+    <a href="https://in.linkedin.com/in/sehgal-simran">linkedin</a>
+  </footer>
+
+</body>
+</html>

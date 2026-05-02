@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="blueprint">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP is Just Plumbing (And That&rsquo;s Fine) — Tangents</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../theme.js"></script>
+</head>
+<body>
+
+  <div class="theme-dots">
+    <span class="theme-dot" data-theme="light" title="Light"></span>
+    <span class="theme-dot" data-theme="dark" title="Dark"></span>
+    <span class="theme-dot" data-theme="warm" title="Warm"></span>
+    <span class="theme-dot" data-theme="lavender" title="Lavender"></span>
+    <span class="theme-dot" data-theme="blueprint" title="Blueprint"></span>
+    <span class="theme-dot" data-theme="starry" title="Starry"></span>
+  </div>
+
+  <a class="back-link" href="../index.html">&larr; Tangents</a>
+
+  <header class="post-header">
+    <h1 class="post-title">MCP is Just Plumbing (And That&rsquo;s Fine)</h1>
+    <p class="post-meta">April 2026</p>
+  </header>
+
+  <article class="post-body">
+    <p><em>The opinion. What MCP tells us about how the AI ecosystem actually evolves.</em></p>
+
+    <p><a href="https://imgs.xkcd.com/comics/standards.png">xkcd #927: Standards</a></p>
+
+    <hr>
+
+    <p>Heard it when it first came out — APIs but for LLMs. Its touted to be quite general:</p>
+
+    <blockquote>Think of MCP like a USB-C port for AI applications. Just as USB-C provides a standardized way to connect electronic devices, MCP provides a standardized way to connect AI applications to external systems. <a href="https://modelcontextprotocol.io/introduction">Source</a></blockquote>
+
+    <p>The USB-C analogy from Anthropic does make grand promises. But for context: USB-C didn&rsquo;t succeed for its technical novelty. It succeeded because everyone came on board after around a decade.</p>
+
+    <p>The promises are huge, but MCP (imho) is just plumbing.</p>
+
+    <blockquote>MCP provides access to an ecosystem of data sources, tools and apps <a href="https://modelcontextprotocol.io/introduction">Source</a></blockquote>
+
+    <p>Is MCP the missing piece that enables LLMs to start talking to data sources, tools and apps NOW, or is it the foundation stone on top of which the ecosystem will be built? My hunch is that it is partly both — a lot of MCP servers I have seen are built on top of existing exposed APIs, while some are custom developed too.</p>
+
+    <p><em>For a technical breakdown of how MCP actually works: <a href="anatomy-of-mcp.html">Anatomy of MCP</a></em></p>
+
+    <h2>Nothing New Under the Hood</h2>
+
+    <p>MCP&rsquo;s data layer is <a href="https://www.jsonrpc.org/specification">JSON-RPC 2.0</a> (yes, from 2010). Its transport layer is STDIO and streamable HTTP. TCP/IP, UDP, HTTP — these were such new inventions, new ways of agreement for the computer science community. MCP just feels like a neatly packaged gift box of existing tech — which I suppose is enough to deem it a protocol should it be able to reign supreme and simplify communication between different entities, i.e. LLM and the world. But still&hellip;the nerd in me is a little disappointed to not find something new under the hood.</p>
+
+    <p>The architects made a pragmatic choice: reuse battle-tested transport layers and push the complexity into the data layer. Smart — but the complexity doesn&rsquo;t disappear, it just moves. Work that needs to be done cannot be avoided, only relocated.</p>
+
+    <h2>The Plumbing Won</h2>
+
+    <p>Despite being &ldquo;just&rdquo; existing tech repackaged, MCP won the standards war. OpenAI adopted it across ChatGPT desktop, Agents SDK, and Responses API. Google DeepMind confirmed MCP support in Gemini. In December 2025, Anthropic donated MCP to the <a href="https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation">Agentic AI Foundation</a> under the Linux Foundation, co-founded with Block and OpenAI. Red Hat just launched an MCP server for RHEL.</p>
+
+    <p>The New Stack literally ran an article titled <a href="https://thenewstack.io/why-the-model-context-protocol-won/">Why the Model Context Protocol Won</a>. It won not because it was technically novel, but because it was good-enough plumbing that everyone agreed on. USB-C parallel intensifies.</p>
+
+    <p>The server ecosystem is exploding — fraud prevention, game asset generation, enterprise governance. What will separate competition is the resources (i.e. data) but also prompts, as that is driving engagement between LLM and the server. The tool I see more like a calculator, defined in its purview.</p>
+
+    <h2>The Plumbing is Leaking</h2>
+
+    <p>But here&rsquo;s the thing about plumbing built fast: it leaks.</p>
+
+    <p>Between January and February 2026, security researchers filed <a href="https://www.heyuan110.com/posts/ai/2026-03-10-mcp-security-2026/">30+ CVEs against MCP servers in 60 days</a>. 43% were basic shell injection. 82% of 2,614 implementations surveyed had path traversal vulnerabilities. Anthropic&rsquo;s own Git MCP server had vulnerabilities. Microsoft&rsquo;s MarkItDown MCP server had SSRF. <a href="https://owasp.org/www-project-mcp-top-10/">OWASP now maintains an MCP Top 10</a>. The protocol spec mandates session IDs in URLs — a practice that would get you failed in a security audit.</p>
+
+    <p>And the scaling problem: you cannot connect to 1000s of tools without great resource management. I am already seeing people install 20+ MCP servers and getting memory issues. The <a href="https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/">2026 roadmap</a> confirms it — stateful sessions, load balancers, horizontal scaling are all flagged as gaps. For this to scale, for you to actually be able to build a general agent with access to numerous tools, there needs to be recognition of its current limit of parallel processing.</p>
+
+    <h2>So What</h2>
+
+    <p>MCP won the standards war before the plumbing was watertight. The same pragmatism that made it win — reuse existing tech, ship fast, iterate — is now its biggest liability. 30 CVEs in 60 days is what happens when you build the nervous system of AI agents out of duct tape and HTTP.</p>
+
+    <p>The question isn&rsquo;t whether MCP is the standard. It already is. The question is whether the plumbing can be hardened before something breaks at scale.</p>
+
+    <p>In the meantime, I&rsquo;m keeping my MCP server count under 20. My laptop thanks me.</p>
+  </article>
+
+  <footer class="site-footer">
+    Simran Sehgal
+    <span class="footer-sep">&middot;</span>
+    <a href="https://github.com/sehgal-simran">github</a>
+    <span class="footer-sep">&middot;</span>
+    <a href="https://in.linkedin.com/in/sehgal-simran">linkedin</a>
+  </footer>
+
+</body>
+</html>
